@@ -1,0 +1,171 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: sample@example.com
+    name: stsnkmr
+  description: Sample API
+  title: Sample API
+  version: 0.0.1
+servers:
+- url: /
+tags:
+- description: User API
+  name: Authentication
+paths:
+  /signup:
+    post:
+      description: サインアップします
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/signup-request'
+        description: サインアップ情報
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message-response'
+          description: 成功時はメッセージを返します
+        "400":
+          description: 400 (Bad Request)
+          headers:
+            http_status:
+              description: HTTPステータス
+              explode: false
+              schema:
+                type: integer
+              style: simple
+      summary: SignUp
+      tags:
+      - Authentication
+  /signin:
+    post:
+      description: ログインします
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login-request'
+        description: ログイン情報
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jwt-response'
+          description: 成功時はJWTトークンを返します
+        "400":
+          description: 400 (Bad Request)
+          headers:
+            http_status:
+              description: HTTPステータス
+              explode: false
+              schema:
+                type: integer
+              style: simple
+      summary: Login
+      tags:
+      - Authentication
+components:
+  schemas:
+    signup-request:
+      properties:
+        username:
+          description: ユーザー名 (Unique&ログインに使います)
+          example: user01
+          maxLength: 20
+          minLength: 3
+          type: string
+        email:
+          description: メールアドレス
+          example: user01@example.com
+          format: email
+          maxLength: 50
+          type: string
+        role:
+          description: ロール
+          example:
+          - ADMIN
+          - USER
+          items:
+            type: string
+          type: array
+          uniqueItems: true
+        password:
+          description: パスワード
+          example: password
+          maxLength: 40
+          minLength: 6
+          type: string
+      required:
+      - email
+      - password
+      - username
+      type: object
+    message-response:
+      example:
+        message: message
+      properties:
+        message:
+          type: string
+      type: object
+    login-request:
+      properties:
+        username:
+          description: ユーザー名
+          example: user01
+          type: string
+        password:
+          description: パスワード
+          example: password
+          type: string
+      required:
+      - password
+      - username
+      type: object
+    jwt-response:
+      example:
+        roles:
+        - ROLE_USER
+        - ROLE_USER
+        id: 1
+        type: Bearer
+        email: aaa@example.com
+        token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTYxNjQ0NjQ5NiwiaWF0IjoxN
+        username: user123
+      properties:
+        token:
+          description: JWTトークン
+          example: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTYxNjQ0NjQ5NiwiaWF0IjoxN
+          type: string
+        type:
+          default: Bearer
+          description: トークンタイプ
+          type: string
+        id:
+          description: ユーザーID
+          example: 1
+          format: int64
+          type: integer
+        username:
+          description: ユーザー名
+          example: user123
+          type: string
+        email:
+          description: メールアドレス
+          example: aaa@example.com
+          type: string
+        roles:
+          description: ロール
+          items:
+            example: ROLE_USER
+            type: string
+          type: array
+          uniqueItems: true
+      type: object

@@ -1,0 +1,31 @@
+type: object
+required:
+  - username
+  - email
+  - password
+properties:
+  username:
+    type: string
+    example: user01
+    description: ユーザー名 (Unique&ログインに使います)
+    minLength: 3
+    maxLength: 20
+  email:
+    type: string
+    example: user01@example.com
+    description: メールアドレス
+    maxLength: 50
+    format: email
+  role:
+    type: array
+    example: [ ADMIN, USER ]
+    description: ロール
+    uniqueItems: true
+    items:
+      type: string
+  password:
+    type: string
+    example: password
+    description: パスワード
+    minLength: 6
+    maxLength: 40

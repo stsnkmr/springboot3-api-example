@@ -1,0 +1,10 @@
+description: 200 (OK)
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/user.yml
+headers:
+  http_status:
+    description: HTTPステータス
+    schema:
+      type: integer

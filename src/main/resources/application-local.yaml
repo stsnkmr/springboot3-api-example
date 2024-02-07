@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb
+    username: postgres
+    password: 123
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+example:
+  app:
+    jwtSecret: ${JWT_SECRET:'aCzb+JhFZXpXn+nRcSkNEnMt2xTy5UNFs9YWVhDXHtY='}
+    jwtExpirationMs: 86400000

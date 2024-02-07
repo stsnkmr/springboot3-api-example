@@ -1,0 +1,68 @@
+openapi: 3.0.3
+info:
+  title: Sample API
+  description: Sample API
+  version: 0.0.1
+  contact:
+    name: stsnkmr
+    email: sample@example.com
+tags:
+  - name: Authentication
+    description: User API
+paths:
+  /signup:
+    post:
+      operationId: signup
+      summary: SignUp
+      description: サインアップします
+      requestBody:
+        description: サインアップ情報
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./request/signup-request.yaml
+      tags:
+        - Authentication
+      responses:
+        200:
+          description: 成功時はメッセージを返します
+          content:
+            application/json:
+              schema:
+                $ref: ./response/message-response.yaml
+        400:
+          description: 400 (Bad Request)
+          headers:
+            http_status:
+              description: HTTPステータス
+              schema:
+                type: integer
+  /signin:
+    post:
+      operationId: login
+      summary: Login
+      description: ログインします
+      requestBody:
+        description: ログイン情報
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./request/login-request.yaml
+      tags:
+        - Authentication
+      responses:
+        200:
+          description: 成功時はJWTトークンを返します
+          content:
+            application/json:
+              schema:
+                $ref: ./response/jwt-response.yaml
+        400:
+          description: 400 (Bad Request)
+          headers:
+            http_status:
+              description: HTTPステータス
+              schema:
+                type: integer

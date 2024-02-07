@@ -1,0 +1,30 @@
+type: object
+properties:
+  token:
+    type: string
+    description: JWTトークン
+    example: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImV4cCI6MTYxNjQ0NjQ5NiwiaWF0IjoxN
+  type:
+    type: string
+    description: トークンタイプ
+    default: "Bearer"
+  id:
+    type: integer
+    format: int64
+    description: ユーザーID
+    example: 1
+  username:
+    type: string
+    description: ユーザー名
+    example: user123
+  email:
+    type: string
+    description: メールアドレス
+    example: "aaa@example.com"
+  roles:
+    type: array
+    description: ロール
+    uniqueItems: true
+    items:
+      type: string
+      example: ROLE_USER

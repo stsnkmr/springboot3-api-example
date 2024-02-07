@@ -1,0 +1,128 @@
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.2'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.openapi.generator' version '7.2.0'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '21'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2023.0.0")
+}
+
+dependencies {
+    implementation(
+            'org.springframework.boot:spring-boot-starter-actuator',
+            'org.springframework.boot:spring-boot-starter-data-jpa',
+            'org.springframework.boot:spring-boot-starter-security',
+            'org.springframework.boot:spring-boot-starter-web',
+            'org.springframework.boot:spring-boot-starter-webflux',
+            'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3',
+
+            // openapi-generator
+            'org.openapitools:jackson-databind-nullable:0.2.6',
+            'io.swagger.core.v3:swagger-annotations:2.2.20',
+            'jakarta.validation:jakarta.validation-api',
+            // Hibernate Validator（Jakarta Bean Validationの実装）
+            'org.hibernate.validator:hibernate-validator',
+            'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0',
+
+            // Auth
+            'io.jsonwebtoken:jjwt-api:0.11.5'
+    )
+    compileOnly('org.projectlombok:lombok')
+    runtimeOnly(
+            'org.postgresql:postgresql',
+            'com.h2database:h2',
+            'io.jsonwebtoken:jjwt-impl:0.11.5',
+            'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    )
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation(
+            'org.springframework.boot:spring-boot-starter-test',
+            'io.projectreactor:reactor-test',
+            'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3',
+            'org.springframework.cloud:spring-cloud-starter-contract-stub-runner',
+            'org.springframework.security:spring-security-test'
+    )
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+sourceSets {
+    main {
+        java.srcDir "$buildDir/generated/src/main/java"
+    }
+    test {
+        java.srcDirs = ['src/test/unit']
+    }
+    integrationTest {
+        java.srcDirs = ['src/integration-test/java']
+        resources.srcDirs = ['src/integration-test/resources']
+        compileClasspath += sourceSets.main.output + test.output
+        runtimeClasspath += sourceSets.main.output + test.output
+    }
+}
+
+openApiGenerate {
+    generatorName = 'spring'
+    outputDir = "$buildDir/generated"
+    inputSpec = "$projectDir/src/main/resources/openapi/spec.yaml"
+    apiPackage = 'com.example.apiapplication.presentation.openapi.api'
+    modelPackage = 'com.example.apiapplication.presentation.openapi.model'
+    modelNamePrefix = 'OpenApi'
+    configOptions = [
+            interfaceOnly       : 'true',
+            skipDefaultInterface: 'true',
+            useTags             : 'true',
+            useSpringBoot3      : 'true',
+            java21              : 'true'
+    ]
+}
+
+tasks.register('specGenerate', GenerateTask) {
+    generatorName = 'openapi-yaml'
+    outputDir = "$projectDir/openapi"
+    inputSpec = "$projectDir/src/main/resources/openapi/spec.yaml"
+    configOptions = [
+            outputFile: "${project.name}.yaml"
+    ] as Map<? extends String, ? extends String>
+}
+
+tasks.register('codegen') {
+    dependsOn 'openApiGenerate', 'specGenerate'
+}
+
+compileJava.dependsOn codegen
+
+tasks.register('copySpecToSwagger', Copy) {
+    dependsOn 'codegen'
+    from "$projectDir/openapi/${project.name}.yaml"
+    into "$projectDir/src/main/resources/static/swagger"
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

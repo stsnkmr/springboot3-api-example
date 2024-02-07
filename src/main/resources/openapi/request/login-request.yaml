@@ -1,0 +1,13 @@
+type: object
+required:
+  - username
+  - password
+properties:
+  username:
+    type: string
+    description: ユーザー名
+    example: user01
+  password:
+    type: string
+    description: パスワード
+    example: password
